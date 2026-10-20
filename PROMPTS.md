@@ -298,7 +298,27 @@ Buat fitur perbandingan 2 produk (US-37) di rute /bandingkan. Pengunjung dapat m
 **Hasil:**
 Halaman `app/bandingkan/page.jsx` menampilkan formulir seleksi 2 produk dan tabel komparasi berdampingan. Tautan akses cepat perbandingan juga ditambahkan di navigasi Header dan halaman detail produk.
 
+### US-14 Deskripsi Produk Dibuat AI **[SENDIRI]**
+
+**Prompt:**
+Integrasikan generator deskripsi otomatis dengan AI menggunakan Google Gemini API di halaman form admin /admin/produk/baru dan ubah produk (US-14). Buat Server Action di server agar API key aman, panggil Gemini untuk membuat deskripsi ringkas berbasis nama dan kategori produk, lalu isi kolom deskripsi secara otomatis sebelum disimpan.
+
+**Hasil:**
+Modul `lib/gemini.js` dan Server Action `buatDeskripsiAIAction` di `app/admin/actions.js` memanggil endpoint REST Gemini 1.5 Flash dari server. Komponen `components/FormProduk.jsx` memiliki tombol "✨ Buat Deskripsi dengan AI" yang otomatis mengisi textarea deskripsi.
+
 **Perbaikan:**
-Memberikan penanganan error visual ramah pengguna apabila parameter ID produk di URL tidak valid atau telah dihapus.
+Menyediakan mekanisme fallback cerdas jika koneksi internet atau kuota Gemini bermasalah agar form admin tetap dapat beroperasi tanpa crash.
+
+### US-50 Asisten AI Tanya Jawab Produk **[SENDIRI]**
+
+**Prompt:**
+Bangun fitur kotak tanya asisten AI di halaman detail produk /produk/[id] (US-50). Panggil model LLM dari server dengan batasan panjang pertanyaan (150 karakter), perlindungan spam dasar / rate limit, serta jawaban yang hanya berfokus pada data produk toko.
+
+**Hasil:**
+Dibuat Route Handler `app/api/tanya-ai/route.js` dengan batasan karakter dan filter cooldown anti-spam. Komponen `components/AsistenTanyaProdukAI.jsx` di halaman detail produk menyajikan antarmuka tanya jawab instan yang ramah pengguna.
+
+**Perbaikan:**
+Mengonfigurasi prompt sistem LLM agar selalu merekomendasikan tombol pemesanan WhatsApp toko apabila ada pertanyaan di luar cakupan spesifikasi produk.
+
 
 

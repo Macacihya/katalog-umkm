@@ -6,6 +6,7 @@ import TombolFavorit from "@/components/TombolFavorit";
 import GaleriFotoProduk from "@/components/GaleriFotoProduk";
 import CatatTerakhirDilihat from "@/components/CatatTerakhirDilihat";
 import KartuProduk from "@/components/KartuProduk";
+import AsistenTanyaProdukAI from "@/components/AsistenTanyaProdukAI";
 import { toko } from "@/lib/toko";
 import { buatClientServer } from "@/lib/supabase/server";
 
@@ -152,6 +153,9 @@ export default async function HalamanDetailProduk({ params }) {
           
           {/* Pemilihan Varian (US-48) dan Jumlah (US-12) */}
           <PilihVarianDanJumlah produk={produk} daftarVarian={daftarVarian} />
+
+          {/* Kotak Tanya Asisten AI (US-50) */}
+          <AsistenTanyaProdukAI produkId={produk.id} namaProduk={produk.nama} />
         </div>
       </article>
 

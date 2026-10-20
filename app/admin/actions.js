@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { buatClientSesi } from "@/lib/supabase/server";
+import { buatDeskripsiProdukAI } from "@/lib/gemini";
 
 export async function login(prevState, formData) {
   const data = formData instanceof FormData ? formData : prevState;
@@ -376,6 +377,30 @@ export async function validasiPesananServer({ produkId, varianId, jumlah }) {
     hargaTotal,
   };
 }
+
+// US-14: Deskripsi produk otomatis dengan Gemini API di server
+export async function buatDeskripsiAIAction(nama, kategori) {
+  const supabase = await buatClientSesi();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Akses ditolak: Hanya admin yang dapat menggunakan generator AI." };
+  }
+
+  if (!nama || !nama.trim()) {
+    return { error: "Nama produk harus diisi terlebih dahulu sebelum membuat deskripsi AI." };
+  }
+
+  try {
+    const hasil = await buatDeskripsiProdukAI(nama.trim(), (kategori || "").trim());
+    return { deskripsi: hasil };
+  } catch (err) {
+    return { error: err.message || "Gagal membuat deskripsi dengan AI." };
+  }
+}
+
 
 
 
