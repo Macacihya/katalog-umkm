@@ -227,4 +227,149 @@ export async function hapusProduk(formData) {
   revalidatePath("/");
 }
 
+export async function tambahVarian(prevState, formData) {
+  const data = formData instanceof FormData ? formData : prevState;
+  const produk_id = data?.get?.("produk_id");
+  const nama = String(data?.get?.("nama") ?? "").trim();
+  const hargaRaw = data?.get?.("harga") ?? "";
+  const stokRaw = data?.get?.("stok") ?? "10";
+
+  if (!produk_id) {
+    return { error: "ID produk tidak valid." };
+  }
+  if (!nama) {
+    return { error: "Nama varian wajib diisi." };
+  }
+
+  const hargaInt = parseInt(hargaRaw, 10);
+  if (isNaN(hargaInt) || hargaInt < 0) {
+    return { error: "Harga varian harus berupa angka non-negatif." };
+  }
+
+  const stokInt = parseInt(stokRaw, 10);
+  if (isNaN(stokInt) || stokInt < 0) {
+    return { error: "Stok varian harus berupa angka non-negatif." };
+  }
+
+  const supabase = await buatClientSesi();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return { error: "Akses ditolak: Anda harus login sebagai admin." };
+  }
+
+  const { error } = await supabase.from("varian").insert([
+    {
+      produk_id,
+      nama,
+      harga: hargaInt,
+      stok: stokInt,
+    },
+  ]);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath(`/admin/produk/${produk_id}/ubah`);
+  revalidatePath(`/produk/${produk_id}`);
+  return { success: "Varian berhasil ditambahkan." };
+}
+
+export async function hapusVarian(formData) {
+  const id = formData?.get?.("id");
+  const produk_id = formData?.get?.("produk_id");
+
+  if (!id) {
+    throw new Error("ID varian tidak valid.");
+  }
+
+  const supabase = await buatClientSesi();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("Akses ditolak: Anda harus login sebagai admin.");
+  }
+
+  const { error } = await supabase.from("varian").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (produk_id) {
+    revalidatePath(`/admin/produk/${produk_id}/ubah`);
+    revalidatePath(`/produk/${produk_id}`);
+  }
+}
+
+export async function validasiPesananServer({ produkId, varianId, jumlah }) {
+  const jumlahInt = parseInt(jumlah, 10);
+  if (isNaN(jumlahInt) || jumlahInt < 1) {
+    return { valid: false, error: "Jumlah pembelian minimal 1 pcs." };
+  }
+
+  const supabase = await buatClientSesi();
+  const { data: produk, error: errProduk } = await supabase
+    .from("produk")
+    .select("id, nama, harga")
+    .eq("id", produkId)
+    .maybeSingle();
+
+  if (errProduk || !produk) {
+    return { valid: false, error: "Produk tidak ditemukan." };
+  }
+
+  if (varianId) {
+    const { data: varian, error: errVarian } = await supabase
+      .from("varian")
+      .select("id, nama, harga, stok")
+      .eq("id", varianId)
+      .eq("produk_id", produkId)
+      .maybeSingle();
+
+    if (errVarian || !varian) {
+      return { valid: false, error: "Varian produk tidak ditemukan." };
+    }
+
+    if (varian.stok < jumlahInt) {
+      return {
+        valid: false,
+        error: `Stok varian "${varian.nama}" tidak mencukupi (sisa ${varian.stok} pcs).`,
+      };
+    }
+
+    const hargaTotal = varian.harga * jumlahInt;
+    return {
+      valid: true,
+      produkId: produk.id,
+      namaProduk: produk.nama,
+      varianId: varian.id,
+      namaVarian: varian.nama,
+      hargaSatuan: varian.harga,
+      jumlah: jumlahInt,
+      hargaTotal,
+    };
+  }
+
+  const hargaTotal = produk.harga * jumlahInt;
+  return {
+    valid: true,
+    produkId: produk.id,
+    namaProduk: produk.nama,
+    varianId: null,
+    namaVarian: null,
+    hargaSatuan: produk.harga,
+    jumlah: jumlahInt,
+    hargaTotal,
+  };
+}
+
+
 

@@ -88,3 +88,24 @@ select
 from kategori k
 cross join lateral unnest(k.daftar) with ordinality as p (nama, ke)
 where not exists (select 1 from public.produk where deskripsi like 'Contoh untuk uji paginasi%');
+
+-- 5. Tabel varian produk (US-48 & US-12)
+create table if not exists public.varian (
+  id bigint generated always as identity primary key,
+  produk_id bigint not null references public.produk(id) on delete cascade,
+  nama text not null,
+  harga integer not null check (harga >= 0),
+  stok integer not null default 10 check (stok >= 0),
+  created_at timestamptz not null default now()
+);
+
+alter table public.varian enable row level security;
+
+drop policy if exists "admin_kelola_varian" on public.varian;
+create policy "admin_kelola_varian" on public.varian
+  for all to authenticated using (true) with check (true);
+
+drop policy if exists "publik_baca_varian" on public.varian;
+create policy "publik_baca_varian" on public.varian
+  for select to anon using (true);
+
