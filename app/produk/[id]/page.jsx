@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PilihVarianDanJumlah from "@/components/PilihVarianDanJumlah";
 import TombolBagikan from "@/components/TombolBagikan";
+import TombolFavorit from "@/components/TombolFavorit";
 import { toko } from "@/lib/toko";
 import { buatClientServer } from "@/lib/supabase/server";
 
@@ -84,7 +85,10 @@ export default async function HalamanDetailProduk({ params }) {
           <Link href="/" className="text-sm text-teks-lembut underline underline-offset-4 hover:text-utama">
             Kembali ke katalog
           </Link>
-          <TombolBagikan namaProduk={produk.nama} />
+          <div className="flex items-center gap-2">
+            <TombolFavorit produkId={produk.id} />
+            <TombolBagikan namaProduk={produk.nama} />
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <p className="text-sm text-teks-lembut">{produk.kategori}</p>

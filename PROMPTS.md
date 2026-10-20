@@ -168,3 +168,59 @@ Tambahkan penanganan status stok habis dengan menonaktifkan tombol pemesanan Wha
 
 **Perbaikan:**
 Menyediakan kalkulasi usia produk (`created_at`) untuk otomatis menampilkan badge "Baru" bila produk dirilis dalam 14 hari terakhir.
+
+### US-30 Dashboard Ringkasan Admin **[SENDIRI]**
+
+**Prompt:**
+Buat ringkasan statistik toko di halaman /admin (US-30). Tampilkan total jumlah produk, total kategori unik, kategori terbanyak, dan rincian jumlah produk per kategori dari database yang hanya bisa diakses setelah login.
+
+**Hasil:**
+`app/admin/page.jsx` menyajikan kartu ringkasan Total Produk, Total Kategori, dan breakdown chip per kategori dari query tabel produk Supabase secara dinamis.
+
+**Perbaikan:**
+Mengurutkan kategori terbanyak ke terendah secara otomatis pada panel ringkasan admin.
+
+### US-35 Ekspor Produk ke CSV **[SENDIRI]**
+
+**Prompt:**
+Buat fitur ekspor data seluruh produk ke format CSV di halaman admin (US-35). Buat Route Handler di server dengan verifikasi login admin, escaping karakter khusus yang aman, dan tombol unduh di /admin.
+
+**Hasil:**
+Route handler `app/admin/ekspor/route.js` menghasilkan file CSV dengan header Content-Disposition `attachment; filename="produk-katalog-umkm.csv"` dan escape tanda kutip/koma yang aman. Tanpa login sesi admin, endpoint menolak akses dengan status 401/307.
+
+**Perbaikan:**
+Menambahkan Byte Order Mark (BOM) UTF-8 (`\uFEFF`) agar file CSV terbuka sempurna di Microsoft Excel tanpa masalah encoding teks.
+
+### US-33 Cari dan Paginasi di List Admin **[SENDIRI]**
+
+**Prompt:**
+Implementasikan kolom pencarian nama produk dan navigasi paginasi di tabel admin /admin (US-33). Simpan kata kunci pencarian (q) dan nomor halaman (hal) di parameter URL browser.
+
+**Hasil:**
+Admin dapat memfilter nama produk langsung ke database menggunakan parameter URL `?q=...` dan berpindah halaman dengan kontrol paginasi `?hal=...`.
+
+**Perbaikan:**
+Menambahkan tombol Reset pencarian dan memastikan filter pencarian tetap terjaga saat berpindah halaman.
+
+### US-24 Favorit Tersimpan di Browser **[SENDIRI]**
+
+**Prompt:**
+Tambahkan fitur produk favorit (US-24). Berikan tombol hati (love) di kartu katalog dan detail produk yang tersimpan di localStorage browser, serta buat tampilan halaman khusus di /favorit yang hanya menampilkan produk favorit.
+
+**Hasil:**
+Komponen `TombolFavorit.jsx` mengelola status favorit secara reaktif via CustomEvent dan localStorage. Halaman `/favorit` menyaring daftar produk pilihan pengunjung dan menyediakan empty state jika belum ada produk tersimpan.
+
+**Perbaikan:**
+Mencegah event bubbling pada kartu produk agar menekan tombol favorit tidak langsung memicu navigasi ke halaman detail.
+
+### US-25 Mode Gelap **[SENDIRI]**
+
+**Prompt:**
+Buat fitur Mode Gelap (Dark Mode) dengan toggle switch di Header (US-25). Pastikan pilihan mode tersimpan di localStorage, CSS token warna mudah dibaca, dan tema bertahan setelah halaman dimuat ulang.
+
+**Hasil:**
+`app/globals.css` memiliki variasi token warna CSS untuk `html.dark`. Komponen `TombolModeGelap.jsx` di Header memungkinkan peralihan instan antara tema terang dan gelap dengan persistensi localStorage.
+
+**Perbaikan:**
+Menambahkan properti CSS `color-scheme: dark` dan transisi halus pada elemen `html` untuk kenyamanan visual pengguna.
+

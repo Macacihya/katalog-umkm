@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
+import TombolFavorit from "@/components/TombolFavorit";
 
 export default function KartuProduk({ produk }) {
   const isHabis =
@@ -42,6 +43,11 @@ export default function KartuProduk({ produk }) {
             Baru
           </span>
         )}
+      </div>
+
+      {/* Tombol Favorit (US-24) */}
+      <div className="absolute right-2.5 top-2.5 z-10">
+        <TombolFavorit produkId={produk.id} />
       </div>
 
       <img

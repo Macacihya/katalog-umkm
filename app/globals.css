@@ -22,9 +22,29 @@
   --color-bahaya: #b42318;
 }
 
+/* Dukungan Mode Gelap (US-25) */
+html.dark {
+  --color-latar: #121815;
+  --color-permukaan: #1a2320;
+  --color-garis: #2a3731;
+  --color-teks: #edf3f0;
+  --color-teks-lembut: #9db2a7;
+
+  --color-utama: #38b284;
+  --color-utama-gelap: #23835e;
+
+  --color-harga: #f6c06a;
+  --color-harga-latar: #382710;
+
+  --color-bahaya: #f04438;
+  color-scheme: dark;
+}
+
 html {
   color: var(--color-teks);
   background: var(--color-latar);
+  color-scheme: light;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 :focus-visible {
