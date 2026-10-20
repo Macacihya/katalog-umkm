@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { formatRupiah } from "@/lib/format";
 import { toko } from "@/lib/toko";
+import { simpanKeKeranjang } from "@/components/Keranjang";
 
 export default function PilihVarianDanJumlah({ produk, daftarVarian = [] }) {
+  const [notifKeranjang, setNotifKeranjang] = useState(false);
   const adaVarian = daftarVarian.length > 0;
 
   // Pilih varian pertama yang masih memiliki stok, atau varian pertama jika semua habis
@@ -54,6 +56,21 @@ export default function PilihVarianDanJumlah({ produk, daftarVarian = [] }) {
     if (jumlah < stokMaksimal) {
       setJumlah((prev) => prev + 1);
     }
+  }
+
+  function handleTambahKeranjang() {
+    if (isHabis) return;
+    simpanKeKeranjang({
+      id: produk.id,
+      nama: produk.nama,
+      harga: hargaSatuan,
+      foto_url: produk.foto_url,
+      varianId: varianTerpilih?.id || null,
+      varianNama: varianTerpilih?.nama || null,
+      jumlah: jumlah || 1,
+    });
+    setNotifKeranjang(true);
+    setTimeout(() => setNotifKeranjang(false), 2000);
   }
 
   // Format pesan WhatsApp otomatis (US-12 & US-48)
@@ -167,8 +184,8 @@ export default function PilihVarianDanJumlah({ produk, daftarVarian = [] }) {
         </div>
       </div>
 
-      {/* Tombol Pesan via WhatsApp */}
-      <div className="pt-2">
+      {/* Tombol Aksi: Pesan via WhatsApp & Tambah ke Keranjang (US-21) */}
+      <div className="flex flex-wrap gap-3 pt-2">
         {isHabis ? (
           <button
             type="button"
@@ -178,14 +195,23 @@ export default function PilihVarianDanJumlah({ produk, daftarVarian = [] }) {
             Stok Habis
           </button>
         ) : (
-          <a
-            href={urlWhatsApp}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex w-full items-center justify-center rounded-lg bg-utama px-5 py-3 font-semibold text-white hover:bg-utama-gelap transition-colors sm:w-auto"
-          >
-            Pesan via WhatsApp
-          </a>
+          <>
+            <a
+              href={urlWhatsApp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex flex-1 items-center justify-center rounded-lg bg-utama px-5 py-3 font-semibold text-white hover:bg-utama-gelap transition-colors text-center"
+            >
+              Pesan via WhatsApp
+            </a>
+            <button
+              type="button"
+              onClick={handleTambahKeranjang}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-utama bg-permukaan px-5 py-3 font-semibold text-utama hover:bg-utama/10 transition-colors"
+            >
+              {notifKeranjang ? "✓ Ditambahkan" : "🛒 Tambah ke Keranjang"}
+            </button>
+          </>
         )}
       </div>
     </div>

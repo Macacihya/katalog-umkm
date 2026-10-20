@@ -224,3 +224,81 @@ Buat fitur Mode Gelap (Dark Mode) dengan toggle switch di Header (US-25). Pastik
 **Perbaikan:**
 Menambahkan properti CSS `color-scheme: dark` dan transisi halus pada elemen `html` untuk kenyamanan visual pengguna.
 
+### US-34 Validasi Form Admin di Server **[SENDIRI]**
+
+**Prompt:**
+Implementasikan validasi input di sisi server pada form tambah dan ubah produk admin (US-34). Pastikan nama wajib diisi dan harga berupa bilangan bulat positif. Tampilkan pesan kesalahan per field di bawah input yang bermasalah serta pertahankan nilai yang sudah diisi saat validasi gagal.
+
+**Hasil:**
+Server Action di `app/admin/actions.js` kini mengembalikan objek `fieldErrors` spesifik untuk setiap field input. Komponen `components/FormProduk.jsx` menampilkan pesan error inline merah tepat di bawah kolom yang bermasalah serta mempertahankan isian form lama dari `state.data`.
+
+**Perbaikan:**
+Menambahkan sanitasi casting string ke integer sebelum validasi harga agar string kosong atau negatif tertolak dengan pesan yang ramah.
+
+### US-17 Produk Terkait di Halaman Detail **[SENDIRI]**
+
+**Prompt:**
+Tampilkan bagian produk terkait di halaman detail produk /produk/[id] (US-17). Ambil beberapa produk lain dari kategori yang sama dari database Supabase secara server-side, dengan mengecualikan produk yang sedang dibuka.
+
+**Hasil:**
+`app/produk/[id]/page.jsx` memuat hingga 3 produk lain dengan kategori serupa menggunakan query Supabase `.eq("kategori", produk.kategori).neq("id", id).limit(3)` dan merendernya dalam grid kartu produk.
+
+**Perbaikan:**
+Menambahkan fallback aman bila kategori produk kosong atau bila belum ada produk lain dalam kategori tersebut.
+
+### US-18 Galeri Beberapa Foto Produk **[SENDIRI]**
+
+**Prompt:**
+Buat komponen galeri foto produk di halaman detail produk (US-18) yang mendukung produk dengan satu foto maupun beberapa foto (multi-photo) dengan navigasi thumbnail yang responsif.
+
+**Hasil:**
+Komponen `components/GaleriFotoProduk.jsx` mendukung parsing foto tunggal, array JSON, maupun daftar URL dipisahkan koma. Pengunjung dapat mengeklik thumbnail untuk mengganti foto utama secara instan, dan produk dengan satu foto tetap tampil rapi tanpa thumbnail.
+
+**Perbaikan:**
+Memberikan visual ring highlight pada thumbnail yang sedang aktif agar pengunjung tahu foto mana yang sedang ditampilkan.
+
+### US-36 Terakhir Dilihat **[SENDIRI]**
+
+**Prompt:**
+Tambahkan fitur riwayat produk terakhir dilihat (US-36). Simpan produk yang baru dibuka pengunjung ke browser dengan batas maksimal 6 produk, dan tampilkan bagian "Terakhir dilihat" di beranda hanya bila riwayat tidak kosong.
+
+**Hasil:**
+Komponen `CatatTerakhirDilihat.jsx` mencatat data produk yang dibuka ke `localStorage` (`umkm_terakhir_dilihat`). Komponen `TerakhirDilihat.jsx` di beranda menampilkan grid produk riwayat beserta tombol pembersih riwayat.
+
+**Perbaikan:**
+Mencegah duplikasi produk di riwayat dengan memindahkan produk yang baru dibuka kembali ke posisi terdepan daftar.
+
+### US-49 Halaman per Kategori **[SENDIRI]**
+
+**Prompt:**
+Buat halaman khusus per kategori di rute /kategori/[slug] (US-49). Tampilkan seluruh produk dari kategori tersebut dari database Supabase. Jika kategori tidak ditemukan, tampilkan halaman 404 (notFound). Tautkan nama kategori pada halaman detail produk langsung ke rute ini.
+
+**Hasil:**
+Dibuat halaman dinamis `app/kategori/[slug]/page.jsx` dengan query Supabase `.ilike("kategori", decodedSlug)`. Halaman detail produk kini menautkan label kategori menuju `/kategori/[slug]` yang sesuai.
+
+**Perbaikan:**
+Menyediakan `decodeURIComponent` untuk menangani slug URL kategori yang mengandung spasi atau karakter khusus.
+
+### US-21 Keranjang Belanja & Pesan Semua via WhatsApp **[SENDIRI]**
+
+**Prompt:**
+Bangun fitur Keranjang Belanja lengkap dengan pengiriman seluruh pesanan via WhatsApp (US-21). Sediakan tombol "Tambah ke Keranjang" di halaman produk, kontrol ubah kuantitas, hapus item, perhitungan total harga dinamis, persistensi saat berpindah halaman, serta tombol pesan semua ke WhatsApp toko.
+
+**Hasil:**
+Komponen `Keranjang.jsx` menyajikan drawer belanja dengan ringkasan item, kontrol penyesuaian kuantitas, kalkulasi total belanja, serta tombol checkout WhatsApp yang menyusun pesan multi-item rapi dan ter-encode. Tombol "Tambah ke Keranjang" dipasang di `PilihVarianDanJumlah.jsx`.
+
+**Perbaikan:**
+Menyinkronkan status isi keranjang antar komponen secara real-time menggunakan `CustomEvent` `umkm:keranjang-berubah`.
+
+### US-37 Bandingkan 2 Produk **[SENDIRI]**
+
+**Prompt:**
+Buat fitur perbandingan 2 produk (US-37) di rute /bandingkan. Pengunjung dapat memilih 2 produk dari dropdown untuk membandingkan foto, kategori, harga, dan deskripsi secara berdampingan. Tangani produk tidak ditemukan dengan pesan yang jelas.
+
+**Hasil:**
+Halaman `app/bandingkan/page.jsx` menampilkan formulir seleksi 2 produk dan tabel komparasi berdampingan. Tautan akses cepat perbandingan juga ditambahkan di navigasi Header dan halaman detail produk.
+
+**Perbaikan:**
+Memberikan penanganan error visual ramah pengguna apabila parameter ID produk di URL tidak valid atau telah dihapus.
+
+

@@ -82,18 +82,21 @@ export async function tambahProduk(prevState, formData) {
   const foto_url = String(data?.get?.("foto_url") ?? "").trim() || "/produk/kopi.svg";
   const deskripsi = String(data?.get?.("deskripsi") ?? "").trim();
 
-  // Validasi input server
-  if (!nama) {
-    return {
-      error: "Nama produk wajib diisi.",
-      data: { nama, harga: hargaRaw, kategori, foto_url, deskripsi },
-    };
-  }
+  // Validasi input server (US-34: per field)
+  const fieldErrors = {};
+  if (!nama) fieldErrors.nama = "Nama produk wajib diisi.";
 
   const hargaInt = parseInt(hargaRaw, 10);
-  if (isNaN(hargaInt) || hargaInt < 0) {
+  if (!hargaRaw && hargaRaw !== 0) {
+    fieldErrors.harga = "Harga wajib diisi.";
+  } else if (isNaN(hargaInt) || hargaInt < 0) {
+    fieldErrors.harga = "Harga harus berupa angka positif.";
+  }
+
+  if (Object.keys(fieldErrors).length > 0) {
     return {
-      error: "Harga harus berupa angka dan tidak boleh negatif.",
+      error: "Periksa kembali isian form.",
+      fieldErrors,
       data: { nama, harga: hargaRaw, kategori, foto_url, deskripsi },
     };
   }
@@ -147,18 +150,21 @@ export async function ubahProduk(prevState, formData) {
     return { error: "ID produk tidak valid." };
   }
 
-  // Validasi input server
-  if (!nama) {
-    return {
-      error: "Nama produk wajib diisi.",
-      data: { id, nama, harga: hargaRaw, kategori, foto_url, deskripsi },
-    };
-  }
+  // Validasi input server (US-34: per field)
+  const fieldErrors = {};
+  if (!nama) fieldErrors.nama = "Nama produk wajib diisi.";
 
   const hargaInt = parseInt(hargaRaw, 10);
-  if (isNaN(hargaInt) || hargaInt < 0) {
+  if (!hargaRaw && hargaRaw !== 0) {
+    fieldErrors.harga = "Harga wajib diisi.";
+  } else if (isNaN(hargaInt) || hargaInt < 0) {
+    fieldErrors.harga = "Harga harus berupa angka positif.";
+  }
+
+  if (Object.keys(fieldErrors).length > 0) {
     return {
-      error: "Harga harus berupa angka dan tidak boleh negatif.",
+      error: "Periksa kembali isian form.",
+      fieldErrors,
       data: { id, nama, harga: hargaRaw, kategori, foto_url, deskripsi },
     };
   }

@@ -2,6 +2,7 @@ import KartuProduk from "@/components/KartuProduk";
 import FilterKatalog from "@/components/FilterKatalog";
 import Paginasi from "@/components/Paginasi";
 import Tombol from "@/components/Tombol";
+import TerakhirDilihat from "@/components/TerakhirDilihat";
 import { buatClientServer } from "@/lib/supabase/server";
 import { toko } from "@/lib/toko";
 
@@ -159,6 +160,9 @@ export default async function HalamanKatalog({ searchParams }) {
           </>
         )}
       </section>
+
+      {/* Bagian Terakhir Dilihat (US-36) */}
+      <TerakhirDilihat />
     </>
   );
 }
